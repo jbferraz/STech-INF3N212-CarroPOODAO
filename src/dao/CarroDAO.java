@@ -14,7 +14,6 @@ import model.Carro;
 import servicos.PessoaServicos;
 import servicos.ServicosFactory;
 
-
 /**
  *
  * @author jbferraz
@@ -41,8 +40,8 @@ public class CarroDAO {
                     + e.getMessage());
         }
     }
-    
-    public ArrayList<Carro> getCarros(){
+
+    public ArrayList<Carro> getCarros() {
         ArrayList<Carro> carros = new ArrayList<>();
         try {
             Connection con = Conexao.getConexao();
@@ -50,7 +49,7 @@ public class CarroDAO {
                     + "join pessoas p on c.proprietario = p.idPessoa";
             PreparedStatement pst = con.prepareStatement(sql);
             ResultSet rs = pst.executeQuery();
-            while(rs.next()){
+            while (rs.next()) {
                 Carro c = new Carro();
                 c.setPlaca(rs.getString("placa"));
                 c.setMarca(rs.getString("marca"));
@@ -68,11 +67,11 @@ public class CarroDAO {
             System.out.println("Erro ao listar Carro.\n"
                     + e.getMessage());
         }
-        
+
         return carros;
     }//fim getCarros
 
-    public Carro getCarroByDoc(String placa){
+    public Carro getCarroByDoc(String placa) {
         Carro c = new Carro();
         try {
             Connection con = Conexao.getConexao();
@@ -82,7 +81,7 @@ public class CarroDAO {
             PreparedStatement pst = con.prepareStatement(sql);
             pst.setString(1, placa);
             ResultSet rs = pst.executeQuery();
-            while(rs.next()){
+            while (rs.next()) {
                 c.setPlaca(rs.getString("placa"));
                 c.setMarca(rs.getString("marca"));
                 c.setModelo(rs.getString("modelo"));
@@ -95,10 +94,40 @@ public class CarroDAO {
                 c.setProprietario(pessoaS.getPessoaByDoc(rs.getString("cpf")));
             }
         } catch (SQLException e) {
-            System.out.println("Erro ao buscar placa.\n"
-                    + e.getMessage());
+            System.out.println("Erro ao buscar placa.\n" + e.getMessage());
         }
         return c;
-    }
+    }//fim getCarroByDoc
+
+    public void atualizarCarro(Carro cVO) {
+        try {
+            Connection con = Conexao.getConexao();
+            String sql = "update carros set cor = ?, tpCambio = ?, combustivel = ?, "
+                    + "proprietario = ? where placa = ?";
+            PreparedStatement pst = con.prepareStatement(sql);
+            pst.setString(1, cVO.getCor());
+            pst.setString(2, cVO.getTpCambio());
+            pst.setString(3, cVO.getCombustivel());
+            PessoaServicos pessoaS = ServicosFactory.getPessoaServicos();
+            pst.setInt(4, 
+                    pessoaS.getPessoaByDoc(cVO.getProprietario().getCpf()).getIdPessoa());
+            pst.setString(5, cVO.getPlaca());
+            pst.executeUpdate();
+        } catch (SQLException e) {
+            System.out.println("Erro ao atualizar placa.\n" + e.getMessage());
+        }
+    }//fim atualizarCarro
     
+    public void deletarCarro(String placa){
+        try {
+            Connection con = Conexao.getConexao();
+            String sql = "delete from carros where placa = ?";
+            PreparedStatement pst = con.prepareStatement(sql);
+            pst.setString(1, placa);
+            pst.executeUpdate();
+        } catch (SQLException e) {
+            System.out.println("Erro ao deletar carro.\n" + e.getMessage());
+        }
+    }//fim deletarCarro
+
 }//fim da classe
