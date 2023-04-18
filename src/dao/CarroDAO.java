@@ -7,10 +7,13 @@ package dao;
 import conexao.Conexao;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import model.Carro;
 import servicos.PessoaServicos;
 import servicos.ServicosFactory;
+
 
 /**
  *
@@ -38,5 +41,64 @@ public class CarroDAO {
                     + e.getMessage());
         }
     }
+    
+    public ArrayList<Carro> getCarros(){
+        ArrayList<Carro> carros = new ArrayList<>();
+        try {
+            Connection con = Conexao.getConexao();
+            String sql = "select c.*, p.cpf as cpf from carros c "
+                    + "join pessoas p on c.proprietario = p.idPessoa";
+            PreparedStatement pst = con.prepareStatement(sql);
+            ResultSet rs = pst.executeQuery();
+            while(rs.next()){
+                Carro c = new Carro();
+                c.setPlaca(rs.getString("placa"));
+                c.setMarca(rs.getString("marca"));
+                c.setModelo(rs.getString("modelo"));
+                c.setAnoFab(rs.getInt("anoFab"));
+                c.setAnoMod(rs.getInt("anoMod"));
+                c.setCor(rs.getString("cor"));
+                c.setTpCambio(rs.getString("tpCambio"));
+                c.setCombustivel(rs.getString("combustivel"));
+                PessoaServicos pessoaS = ServicosFactory.getPessoaServicos();
+                c.setProprietario(pessoaS.getPessoaByDoc(rs.getString("cpf")));
+                carros.add(c);
+            }
+        } catch (SQLException e) {
+            System.out.println("Erro ao listar Carro.\n"
+                    + e.getMessage());
+        }
+        
+        return carros;
+    }//fim getCarros
 
-}
+    public Carro getCarroByDoc(String placa){
+        Carro c = new Carro();
+        try {
+            Connection con = Conexao.getConexao();
+            String sql = "select c.*, p.cpf as cpf from carros c "
+                    + "join pessoas p on c.proprietario = p.idPessoa "
+                    + "where placa = ?";
+            PreparedStatement pst = con.prepareStatement(sql);
+            pst.setString(1, placa);
+            ResultSet rs = pst.executeQuery();
+            while(rs.next()){
+                c.setPlaca(rs.getString("placa"));
+                c.setMarca(rs.getString("marca"));
+                c.setModelo(rs.getString("modelo"));
+                c.setAnoFab(rs.getInt("anoFab"));
+                c.setAnoMod(rs.getInt("anoMod"));
+                c.setCor(rs.getString("cor"));
+                c.setTpCambio(rs.getString("tpCambio"));
+                c.setCombustivel(rs.getString("combustivel"));
+                PessoaServicos pessoaS = ServicosFactory.getPessoaServicos();
+                c.setProprietario(pessoaS.getPessoaByDoc(rs.getString("cpf")));
+            }
+        } catch (SQLException e) {
+            System.out.println("Erro ao buscar placa.\n"
+                    + e.getMessage());
+        }
+        return c;
+    }
+    
+}//fim da classe
