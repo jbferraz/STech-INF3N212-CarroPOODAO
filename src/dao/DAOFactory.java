@@ -9,9 +9,15 @@ package dao;
  * @author jbferraz
  */
 public class DAOFactory {
+
     private static PessoaDAO pDAO = new PessoaDAO();
-    
-    public static PessoaDAO getPessoaDAO(){
+    private static CarroDAO cDAO = new CarroDAO();
+
+    public static PessoaDAO getPessoaDAO() {
         return pDAO;
+    }
+
+    public static CarroDAO getCarroDAO() {
+        return cDAO;
     }
 }

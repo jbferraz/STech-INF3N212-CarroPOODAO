@@ -9,9 +9,15 @@ package servicos;
  * @author jbferraz
  */
 public class ServicosFactory {
+
     private static PessoaServicos pessoaS = new PessoaServicos();
-    
-    public static PessoaServicos getPessoaServicos(){
+    private static CarroServicos carroS = new CarroServicos();
+
+    public static PessoaServicos getPessoaServicos() {
         return pessoaS;
+    }
+
+    public static CarroServicos getCarroServicos() {
+        return carroS;
     }
 }
